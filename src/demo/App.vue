@@ -2,11 +2,12 @@
   <div class="app">
     <p>hello world!</p>
     <p>{{jack}}</p>
+    <foo></foo>
   </div>
 </template>
 
 <script>
-import Foo from './foo.vue';
+import foo from './foo.vue';
 export default {
   data() {
     return {
@@ -14,7 +15,7 @@ export default {
     }
   },
   components: {
-    Foo
+    foo
   }
 }
 </script>

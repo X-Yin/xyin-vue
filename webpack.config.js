@@ -1,20 +1,18 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'production',
-    entry: path.resolve(__dirname, './src/index.js'),
+    entry: path.resolve(__dirname, './src/demo/index.js'),
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist')
     },
     module: {
         rules: [
-            // {
-            //     loader: path.resolve(__dirname, './loader/self-loader.js')
-            // },
             {
-                test: /\.xyin$/,
-                loader: path.resolve(__dirname, 'loader/self-loader.js')
+                test: /\.vue$/,
+                loader: path.resolve(__dirname, 'modules/vue-loader/index.js')
             },
             {
                 test: /\.js$/,
@@ -29,11 +27,16 @@ module.exports = {
                         ident: "babel-loader-options"
                     }
                 ],
-
             }
         ]
     },
     optimization: {
         minimize: false
-    }
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, './src/demo/index.html'),
+            minify: false
+        })
+    ]
 }

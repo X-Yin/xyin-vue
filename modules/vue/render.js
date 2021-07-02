@@ -1,23 +1,21 @@
-import parseHtml from '../vue-loader/parse';
-
+import { Component } from './component';
 /**
- * 解析 componentsList 里面的组件，将里面的 html 字符串先解析成 ast 语法树存起来
+ * node 是 ast 语法树的其中某一个节点
+ * context 是当前的 component 实例，代表上下文环境
  * */
-const componentKeys = Object.keys(componentList);
-const componentAst = {};
-Object.entries(componentList).forEach(entry => {
-    const [key, value] = entry;
-    componentAst[key] = parseHtml(value);
-});
-
-/**
- * currNode 是 ast 语法树的某一个节点，通过该节点来构建 dom 树
- * */
-function createNode(currNode) {
-    const { children, tagName, attributes, text } = currNode;
-    if (componentKeys.indexOf(tagName) > -1) {
-        return createNode(componentAst[tagName]);
+export default function createNode(node, context) {
+    // 如果传入的 node 是 component 的实例，需要把 context 赋值为 component 实例，node 为该实例下面的 ast 节点
+    if (node instanceof Component) {
+        context = node;
+        node = node.ast;
+        const { children, tagName, attributes, text } = node;
+        const components = context.options.components;
+        console.log('>>>>> ', components, tagName, components[tagName]);
+        if (components && components[tagName]) {
+            return createNode(components[tagName], context);
+        }
     }
+    const { children, tagName, attributes, text } = node;
     const tag = document.createElement(tagName);
     attributes.forEach(entry => {
         const {key, value} = entry;
@@ -26,17 +24,9 @@ function createNode(currNode) {
     tag.innerText = text;
     if (children.length) {
         for (const child of children) {
-            const node = createNode(child);
+            const node = createNode(child, context);
             tag.appendChild(node);
         }
     }
     return tag;
-}
-
-// 输入挂载元素的 root id 和要挂载的 html 字符串，将该 html 字符串解析以后挂载到该 id 元素上
-export default function mount(id, content) {
-    const ele = document.getElementById(id.slice(1));
-    const ast = parseHtml(content);
-    const domTree = createNode(ast);
-    ele.appendChild(domTree);
 }

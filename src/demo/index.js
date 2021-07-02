@@ -1,4 +1,5 @@
 import App from './App.vue';
+console.log(App);
 import mount from '../../modules/vue/index';
 
-mount(App, '#app');
+mount('#app', App);
