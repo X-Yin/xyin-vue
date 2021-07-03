@@ -33,4 +33,76 @@ function handleStyle(style) {}
 function handleTemplate(template) {}
 
 const c = new Component();
-console.log(c instanceof Component);
+
+
+function lowerCase(data) {
+    if (typeof data === 'object' && data !== null) {
+        const obj = {};
+        Object.entries(data).forEach(item => {
+            const [key, value] = item;
+            obj[key.toLowerCase()] = value;
+        });
+        return obj;
+    } else if (typeof data === 'string') {
+        return data.toLowerCase();
+    }
+}
+
+
+const data = {
+    age: 30
+}
+
+const proxy1 = new Proxy(data, {
+    get(target, propertyKey, receiver) {
+        return target[propertyKey];
+    },
+    set(target, propertyKey, value) {
+        console.log('>>>', target, propertyKey, value);
+        target[propertyKey] = value;
+    }
+});
+
+const person = {
+    data: proxy1,
+    props: {
+        base: 'hello'
+    },
+    created() {
+        proxy.age = 99;
+        console.log(proxy.age);
+    },
+    name: 'jack',
+    proxy: null
+}
+
+const proxy = new Proxy(person, {
+    get(target, propertyKey, receiver) {
+        if (propertyKey in target) {
+            return target[propertyKey];
+        } else if (propertyKey in target.props) {
+            return target.props[propertyKey];
+        } else if (propertyKey in target.data) {
+            return target.data[propertyKey];
+        }
+    },
+    set(target, propertyKey, value) {
+        if (propertyKey in target) {
+            target[propertyKey] = value;
+        } else if (propertyKey in target.props) {
+            target.props[propertyKey] = value;
+        } else if (propertyKey in target.data) {
+            target.data[propertyKey] = value;
+        } else {
+            target[propertyKey] = value;
+        }
+        return true;
+    }
+});
+
+person.proxy = proxy;
+
+proxy.created();
+
+console.log(proxy.age);
+

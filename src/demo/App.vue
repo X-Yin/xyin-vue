@@ -1,21 +1,31 @@
 <template>
   <div class="app">
     <p>hello world!</p>
-    <p>{{jack}}</p>
     <foo></foo>
+    <p>{{age}}</p>
   </div>
 </template>
 
 <script>
-import foo from './foo.vue';
+import Foo from './foo.vue';
 export default {
+  name: 'App',
+  created() {
+    console.log('App created');
+    setTimeout(() => {
+      this.age = 50;
+    }, 4000);
+  },
+  mounted() {
+    console.log('App mounted');
+  },
   data() {
     return {
-      name: 'jack'
+      age: 30
     }
   },
   components: {
-    foo
+    Foo
   }
 }
 </script>
