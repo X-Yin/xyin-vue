@@ -1,7 +1,7 @@
 {
   "name": "high-vue",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/demo/index.js",
   "license": "MIT",
   "scripts": {
     "build": "webpack --config webpack.config.js --watch"

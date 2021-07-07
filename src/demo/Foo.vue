@@ -2,12 +2,14 @@
   <div class="foo">
     <p>hello foo!</p>
     <p>{{message}}</p>
+    <p>{{age}}</p>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Foo',
+  props: ['age'],
   created() {
     console.log('>>>>>> foo create', this.message);
     setTimeout(() => {

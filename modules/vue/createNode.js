@@ -19,7 +19,9 @@ export default function createNode(node, context) {
     const components = lowerCase(context.options.components);
     if (components && components[tagName]) {
         // return createNode(components[tagName], context);
-        return components[tagName].createElement();
+        const component = components[tagName];
+        component.parentNode = context;
+        return component.createElement(attributes);
     }
 
     const tag = document.createElement(tagName);
@@ -50,3 +52,5 @@ function lowerCase(data) {
         return data.toLowerCase();
     }
 }
+
+function handleEventAttribute() {}

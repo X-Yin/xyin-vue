@@ -1,15 +1,14 @@
-const startTagReg = /^<([a-z0-9A-Z\-]+)(?:([ ]+[0-9a-zA-Z\-]+=[^>]+)*)>/;
+const startTagReg = /^<([a-z0-9A-Z\-]+)(?:([ ]+[0-9a-zA-Z:@\-]+=[^>]+)*)>/;
 const endTagReg = /^<\/([a-z0-9A-Z\-]+)(?:[^> ]*)>/;
-const attributeReg = /^[ ]+([a-zA-Z0-9\-]+=[^> ]+)/;
+const attributeReg = /^[ ]+([a-zA-Z0-9:@\-]+=[^> ]+)/;
 const doctypeReg = /<!doctype[^>]*>/;
 const commentReg = /<!\-\-([^-->]+)\-\->/;
-
 
 /**
  * 输入的是一个 html 字符串
  * 返回的是一个 ast 语法树
  * */
-export default function parseHtml(html) {
+function parseHtml(html) {
     const ast = {
         children: []
     }
@@ -73,3 +72,7 @@ export default function parseHtml(html) {
     parse(ast);
     return ast.children[0];
 }
+
+// export default parseHtml;
+
+module.exports = parseHtml;

@@ -13,6 +13,7 @@ export class Component {
     dom = {};
     watcher = {};
     proxyContext = {};
+    parentNode = {};
 
     constructor(id, ast, style, options) {
         this.id = id;
@@ -50,10 +51,38 @@ export class Component {
         parentNode.replaceChild(this.proxyContext.dom, dom);
     }
 
-    createElement() {
+    // 为 component 加载 props
+    initParentContext(attributes) {
+        // 以 : 开头的 props
+        const propsReg = /^:([0-9a-zA-Z\-]+$)/;
+        // 以 @ 开头的事件
+        const eventReg = /^@([0-9a-zA-Z\-]+$)/;
+        // [{key, value}, {}, {}]
+        attributes.forEach((attribute) => {
+            const {key, value} = attribute; // key :prop value data.a.b
+            if (key.match(propsReg)) {
+                let propsKey = key.match(propsReg)[1];
+                const vals = value.split('.');
+                let val;
+                vals.forEach(k => {
+                    val = this.parentNode[k];
+                });
+                this.proxyContext.props[propsKey] = val;
+            }
+
+            if (value.match(eventReg)) {
+
+            }
+        });
+    }
+
+    createElement(attributes) {
         try {
             this.created();
             pushTarget(this.watcher);
+            if (attributes) {
+                this.initParentContext(attributes);
+            }
             this.dom = createNode(this.ast, this.proxyContext);
             this.handleStyle();
             this.mounted();
@@ -97,6 +126,7 @@ function handleStyle(style) {
 }
 
 function handleTemplate(template) {
+    console.log('>>>>>>>> handleTemplate');
     return parse(template);
 }
 

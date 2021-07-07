@@ -1,8 +1,9 @@
 <template>
   <div class="app">
     <p>hello world!</p>
-    <foo></foo>
+    <Foo :age="age"></Foo>
     <p>{{age}}</p>
+    <button @click="">click</button>
   </div>
 </template>
 

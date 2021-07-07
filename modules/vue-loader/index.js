@@ -1,5 +1,6 @@
 const qs = require('querystring');
 const select = require('./select');
+const path = require('path');
 
 function loader(source) {
     const loaderContext = this;
@@ -23,7 +24,9 @@ function loader(source) {
     const styleReq = `${resourcePath}?type=style`;
     const templateReq = `${resourcePath}?type=template`;
 
-    let code = `import normalizeComponent from '/Users/xieyin/Desktop/high-vue/modules/vue/component.js';
+    const componentClassPath = path.resolve(__dirname, '../vue/component.js');
+
+    let code = `import normalizeComponent from '${componentClassPath}';
                 import script from '${scriptReq}';
                 import style from '${styleReq}';
                 import template from '${templateReq}';
