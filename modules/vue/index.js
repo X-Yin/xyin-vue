@@ -27,5 +27,6 @@ export default class Vue {
          return this;
      }
 }
+window.Vue = Vue;
 
 Vue.eventBus = eventStore;

@@ -12,7 +12,8 @@ export class Component {
     options = {};
     ast = '';
     id = 0;
-    dom = {};
+    oldDom = null;
+    newDom = null;
     watcher = {};
     proxyContext = {};
     parentNode = {};
@@ -56,12 +57,10 @@ export class Component {
     }
 
     updateComponent() {
-        const parentNode = this.proxyContext.dom.parentNode;
-        const oldDom = this.proxyContext.dom;
+        const oldDom = this.proxyContext.oldDom;
         let newDom = this.proxyContext.createElement();
-        // parentNode.replaceChild(this.proxyContext.dom, dom);
+        // oldDom 不可再重新赋值，因为已经在 dom 树中被渲染过了，只能动态的增删，不能重新赋值
         patch(oldDom, newDom);
-        this.proxyContext.dom = newDom;
         newDom = null;
     }
 
@@ -107,6 +106,9 @@ export class Component {
             throw new Error(`component ${this.name || this.id} mount error ${err.message}`);
         } finally {
             popTarget();
+        }
+        if (!this.oldDom) { // 说明是首次渲染，不是后期的数据更新导致的渲染
+            this.oldDom = dom;
         }
         return dom;
     }
