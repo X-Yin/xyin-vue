@@ -1,8 +1,7 @@
 <template>
   <div class="foo">
-    <p>hello foo!</p>
-    <p>{{message}}</p>
-    <p>{{age}}</p>
+    <input type="text" :value="value" @input="onInput"></input>
+    <p class="what">{{value}}</p>
   </div>
 </template>
 
@@ -11,16 +10,22 @@ export default {
   name: 'Foo',
   props: ['age'],
   created() {
-    console.log('>>>>>> foo create', this.message);
-    setTimeout(() => {
-      this.message = 'hello base';
-    }, 2000);
   },
   mounted() {
   },
+  methods: {
+    clickHandler() {
+      console.log(this.eventBus.store);
+      this.trigger('customClick', 'jack', '100');
+    },
+    onInput(e) {
+      this.value = e.target.value;
+    }
+  },
   data() {
     return {
-      message: 'hello world!'
+      message: 'hello world!',
+      value: 'hello world!'
     }
   }
 }

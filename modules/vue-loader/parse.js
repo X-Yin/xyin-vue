@@ -73,6 +73,6 @@ function parseHtml(html) {
     return ast.children[0];
 }
 
-// export default parseHtml;
+export default parseHtml;
 
-module.exports = parseHtml;
+// module.exports = parseHtml;

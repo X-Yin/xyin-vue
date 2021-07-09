@@ -1,0 +1,15 @@
+1          1
+2          2
+3
+旧的多，新的少，removeChild
+
+1          1
+2          2
+           3
+新的少，新的多，appendChild
+
+1          1
+2          4
+3          3
+新旧数量一样，节点内容不同，replaceChild
+

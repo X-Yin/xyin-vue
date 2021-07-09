@@ -8,20 +8,94 @@
     <title>Document</title>
 </head>
 <body>
-<ul id="ul">
-    <li>1</li>
-    <li id="a">2</li>
-    <li>3</li>
-    <li>4</li>
-    <li>5</li>
-</ul>
+<div class="wrapper">
+    <div class="box">
+        <input type="text" class="input">
+        <p>2</p>
+        <p>2</p>
+        <p>8</p>
+    </div>
+</div>
+
+<div class="wrapper">
+    <div class="box">
+        <input type="text" class="input">
+        <p>1</p>
+        <p>4</p>
+        <div>
+            <br/>
+            <p>99</p>
+        </div>
+    </div>
+</div>
 
 <script>
-    const ul = document.getElementById('ul');
-    const li = document.getElementById('a');
-    const ele = document.createElement('li');
-    ele.innerText = '9';
-    ul.replaceChild(ele,li);
+    var box1 = document.getElementsByClassName('box')[0];
+    var box2 = document.getElementsByClassName('box')[1];
+    var input = document.getElementsByClassName('input')[0];
+    input.value = 'hello';
+    function diff(oldDom, newDom) {
+
+        const nodeTypeOld = oldDom.nodeType;
+        const nodeTypeNew = newDom.nodeType;
+        if(nodeTypeOld !== nodeTypeNew) {
+            const cloneNode = newDom.cloneNode(true);
+            oldDom.parentNode.replaceChild(cloneNode, oldDom);
+            return;
+        }
+
+        if (nodeTypeNew === 3) { // element 中实际的文字
+            if (oldDom.nodeValue !== newDom.nodeValue) {
+                oldDom.textContent = newDom.nodeValue;
+            }
+            return;
+        }
+
+        const tagName1 = oldDom.tagName;
+        const tagName2 = newDom.tagName;
+        if (tagName1 !== tagName2) {
+            const cloneNode = newDom.cloneNode(true);
+            oldDom.parentNode.replaceChild(cloneNode, oldDom);
+            return;
+        }
+        if (oldDom.attributes.length === newDom.attributes.length) {
+            const attrsOld = oldDom.attributes;
+            const attrsNew = newDom.attributes;
+            for (let i = 0; i < oldDom.attributes.length; i++) {
+                const nodeNameOld = attrsOld[i].nodeName;
+                const nodeNameNew = attrsNew[i].nodeName;
+                const nodeValueOld = attrsOld[i].nodeValue;
+                const nodeValueNew = attrsNew[i].nodeValue;
+                if (nodeNameOld !== nodeNameNew || nodeValueOld !== nodeValueNew) {
+                    const cloneNode = newDom.cloneNode(true);
+                    oldDom.parentNode.replaceChild(cloneNode, oldDom);
+                    return;
+                }
+            }
+            const childNodesOld = oldDom.childNodes;
+            const childNodesNew = newDom.childNodes;
+            const maxLength = Math.max(childNodesOld.length, childNodesNew.length);
+            for (let i = 0; i < maxLength; i++) {
+                const nodeOld = childNodesOld[i];
+                const nodeNew = childNodesNew[i];
+                if (!nodeOld && nodeNew) {
+                    const cloneNode = nodeNew.cloneNode(true);
+                    oldDom.appendChild(cloneNode);
+                }
+                if (!nodeNew && nodeOld) {
+                    oldDom.removeChild(nodeOld);
+                }
+                if (nodeOld && nodeNew) {
+                    diff(nodeOld, nodeNew);
+                }
+            }
+        } else {
+            oldDom.parentNode.replaceChild(newDom, oldDom);
+            return;
+        }
+    }
+
+    diff(box1, box2);
 </script>
 </body>
 </html>

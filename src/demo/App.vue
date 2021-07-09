@@ -1,32 +1,39 @@
 <template>
   <div class="app">
     <p>hello world!</p>
-    <Foo :age="age"></Foo>
+    <Foo :age="age" @customClick="customClickHandler"></Foo>
     <p>{{age}}</p>
-    <button @click="">click</button>
+    <button @click="clickHandler" name="base">click</button>
+    <Bar></Bar>
   </div>
 </template>
 
 <script>
 import Foo from './foo.vue';
+import Bar from './bar.vue';
 export default {
   name: 'App',
   created() {
-    console.log('App created');
-    setTimeout(() => {
-      this.age = 50;
-    }, 4000);
   },
   mounted() {
-    console.log('App mounted');
   },
   data() {
     return {
       age: 30
     }
   },
+  methods: {
+    clickHandler(e) {
+      this.age = 44;
+    },
+    customClickHandler(name, age) {
+      this.age = 88;
+      console.log('>>>>>>>>> customClickHandler', name, age);
+    }
+  },
   components: {
-    Foo
+    Foo,
+    Bar
   }
 }
 </script>

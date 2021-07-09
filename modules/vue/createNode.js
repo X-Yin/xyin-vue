@@ -25,9 +25,10 @@ export default function createNode(node, context) {
     }
 
     const tag = document.createElement(tagName);
-    attributes.forEach(entry => {
-        const {key, value} = entry;
-        tag.setAttribute(key, value);
+    handleAttribute({
+        tag,
+        attributes,
+        context
     });
     tag.innerText = handleDynamicNode(text, context);
     // tag.innerText = text;
@@ -53,4 +54,25 @@ function lowerCase(data) {
     }
 }
 
-function handleEventAttribute() {}
+function handleAttribute({tag, attributes, context}) {
+    // attributes: [{key: '@click', value: 'clickHandler'}]
+    attributes.forEach(attribute => {
+        const {key, value} = attribute;
+        const eventReg = /^@([0-9a-zA-Z\-]+$)/;
+        const valReg = /^:([0-9a-zA-Z\-]+$)/;
+        if (eventReg.test(key)) {
+            const eventKey = key.match(eventReg)[1];
+            const val = context[value].bind(context);
+            // 如果是普通 dom 元素的事件，直接 addEventListener
+            tag.addEventListener(eventKey, val);
+        } else if(valReg.test(key)) {
+            const valKey = key.match(valReg)[1];
+            const val = context[value];
+            // 如果是普通 dom 元素的属性，直接将该属性设置为 dom 节点的属性
+            // e.g. <input :value="message"> 需要直接设置 input.value 为 message 对应的值
+            tag[valKey] = val;
+        } else {
+            tag.setAttribute(key, value);
+        }
+    });
+}

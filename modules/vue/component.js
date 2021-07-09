@@ -4,6 +4,8 @@ import proxy from './proxy';
 import Watcher from "./reactive/watcher";
 import { pushTarget, popTarget } from "./reactive/dep";
 import Observer from "./reactive/observer";
+import eventStore from './eventBus';
+import patch from './patch';
 
 export class Component {
     style = '';
@@ -20,6 +22,7 @@ export class Component {
         this.ast = ast;
         this.style = style;
         this.options = options;
+        this.eventBus = eventStore;
         this.watcher = new Watcher(this, this.updateComponent.bind(this));
         // 将 options 里面的属性打平到 Component 实例中
         Object.assign(this, {
@@ -44,11 +47,22 @@ export class Component {
         }
     }
 
+    trigger(eventName, ...args) {
+        try {
+            return this.eventBus.trigger(this.genEventName(eventName), ...args);
+        } catch(e) {
+            throw e;
+        }
+    }
+
     updateComponent() {
         const parentNode = this.proxyContext.dom.parentNode;
-        const dom = this.proxyContext.dom;
-        this.proxyContext.createElement();
-        parentNode.replaceChild(this.proxyContext.dom, dom);
+        const oldDom = this.proxyContext.dom;
+        let newDom = this.proxyContext.createElement();
+        // parentNode.replaceChild(this.proxyContext.dom, dom);
+        patch(oldDom, newDom);
+        this.proxyContext.dom = newDom;
+        newDom = null;
     }
 
     // 为 component 加载 props
@@ -70,20 +84,23 @@ export class Component {
                 this.proxyContext.props[propsKey] = val;
             }
 
-            if (value.match(eventReg)) {
-
+            if (key.match(eventReg)) { // {key: '@customClick', value:'clickHandler'}
+                const eventKey = key.match(eventReg)[1];
+                const val = this.parentNode[value].bind(this.parentNode);
+                this.eventBus.on(this.genEventName(eventKey), val);
             }
         });
     }
 
     createElement(attributes) {
+        let dom;
         try {
             this.created();
             pushTarget(this.watcher);
             if (attributes) {
                 this.initParentContext(attributes);
             }
-            this.dom = createNode(this.ast, this.proxyContext);
+            dom = createNode(this.ast, this.proxyContext);
             this.handleStyle();
             this.mounted();
         } catch(err) {
@@ -91,13 +108,17 @@ export class Component {
         } finally {
             popTarget();
         }
-        return this.dom;
+        return dom;
     }
 
     handleStyle() {
         const style = document.createElement('style');
         style.innerText = this.style;
         document.head.appendChild(style);
+    }
+
+    genEventName(eventName) {
+        return this.id + '-' + eventName;
     }
 
 }
@@ -126,7 +147,6 @@ function handleStyle(style) {
 }
 
 function handleTemplate(template) {
-    console.log('>>>>>>>> handleTemplate');
     return parse(template);
 }
 
@@ -148,5 +168,6 @@ function normalizeOptions(options) {
     }
     return options;
 }
+
 
 export default normalizeComponent;
