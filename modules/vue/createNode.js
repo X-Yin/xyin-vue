@@ -1,5 +1,5 @@
 import { handleJsExpression } from "./utils";
-import { extractDirectivesFromAttribute } from "./directives";
+import { extractDirectivesFromAttribute, executeDirectivesHook } from "./directives";
 import Vue from "./index";
 
 export function handleDynamicNode(text, context) {
@@ -33,13 +33,11 @@ export default function createNode(node, context) {
 
     // 这个地方需要先检测 attribute 里面有没有 vue 指令，如果有的话，需要执行钩子函数 createNode
     // 如果这个 create 有返回值的话，就直接 return 返回值，如果没有返回值的话，再走正常的创建流程
-    const directives = extractDirectivesFromAttribute(attributes);
-    for (const directive of directives) {
-        const { key: directiveKey, value: directiveValue } = directive;
-        const tag = Vue.directives[directiveKey].createNode(node, context, directiveValue);
-        if (tag) {
-            return tag;
-        }
+
+    const tag = executeDirectivesHook({
+        attributes, hookName: 'createNode', node, context});
+    if (tag) {
+        return tag;
     }
 
     // 常规创建 dom
@@ -49,6 +47,7 @@ export default function createNode(node, context) {
 export function createNormalNode(node, context) {
     const { children, tagName: tagAlias, attributes, text } = node;
     const tagName = tagAlias.toLowerCase();
+
     // 常规创建 dom
     const tag = document.createElement(tagName);
     handleAttribute({
@@ -62,9 +61,15 @@ export function createNormalNode(node, context) {
         for (const child of children) {
             const node = createNode(child, context);
             // 组件更新完成
+            executeDirectivesHook({attributes: child.attributes, hookName: 'updated', domNode: node})
             // 对于 v-for 来说，返回的这个 node 是一个 documentFragment，被 appendChild 的时候，是所有的子节点被挂载
             tag.appendChild(node);
-            // 组件已经被插入到父节点 inserted
+            // 组件已经被插入到父节点 inserted， 运行指令的钩子函数
+            (function(child, node) {
+                setTimeout(() => {
+                    executeDirectivesHook({attributes: child.attributes, hookName: 'inserted', domNode: node})
+                }, 20);
+            })(child, node)
         }
     }
     return tag;

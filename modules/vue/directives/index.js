@@ -34,6 +34,12 @@ Vue.directive('for', {
     }
 });
 
+Vue.directive('focus', {
+    inserted(el) {
+        el.focus();
+    }
+});
+
 
 // 把 attribute 里面所有的指令都提取出来，返回一个数组，然后按照提取的顺序依次执行
 export function extractDirectivesFromAttribute(attributes) {
@@ -46,4 +52,19 @@ export function extractDirectivesFromAttribute(attributes) {
         }
     }
     return directives;
+}
+
+export function executeDirectivesHook({attributes, hookName, node, context, domNode}) {
+    const directives = extractDirectivesFromAttribute(attributes);
+    for (const directive of directives) {
+        const { key: directiveKey, value: directiveValue } = directive;
+        if (hookName === 'createNode') {
+            const tag = Vue.directives[directiveKey][hookName](node, context, directiveValue);
+            if (tag) {
+                return tag;
+            }
+        } else {
+            Vue.directives[directiveKey][hookName](domNode);
+        }
+    }
 }

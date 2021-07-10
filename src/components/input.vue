@@ -1,6 +1,6 @@
 <template>
   <div class="input-wrapper">
-    <input class="input" type="text" :value="value" :placeholder="placeholder" @input="onInput"></input>
+    <input class="input" type="text" :value="value" :placeholder="placeholder" @input="onInput" v-focus="true"></input>
     <div class="confirm-btn" @click="confirm">confirm</div>
   </div>
 </template>
