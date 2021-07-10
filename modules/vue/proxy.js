@@ -21,6 +21,8 @@ export default function proxy(obj) {
                 target.props[propertyKey] = value;
             } else if (propertyKey in target.data) {
                 target.data[propertyKey] = value;
+            } else {
+                target[propertyKey] = value;
             }
             return true;
         }

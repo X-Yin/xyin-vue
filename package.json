@@ -1,17 +1,20 @@
 {
   "name": "high-vue",
   "version": "1.0.0",
-  "main": "src/demo/index.js",
+  "main": "src/index.js",
   "license": "MIT",
   "scripts": {
     "build": "webpack --config webpack.config.js --watch",
-    "dev": "cd dist && http-server -p 3005 -c-1 --cors",
+    "dev": "node modules/devSever/index.js",
     "start": "npm-run-all --parallel build dev"
   },
   "dependencies": {
     "@babel/core": "^7.14.6",
+    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
+    "@babel/plugin-transform-strict-mode": "^7.14.5",
     "@babel/preset-env": "^7.14.7",
     "babel-loader": "^8.2.2",
+    "express": "^4.17.1",
     "html-webpack-plugin": "^5.3.2",
     "querystring": "^0.2.1",
     "vue": "^2.6.14",

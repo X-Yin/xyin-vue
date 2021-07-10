@@ -1,6 +1,7 @@
 const startTagReg = /^<([a-z0-9A-Z\-]+)(?:([ ]+[0-9a-zA-Z:@\-]+=[^>]+)*)>/;
 const endTagReg = /^<\/([a-z0-9A-Z\-]+)(?:[^> ]*)>/;
-const attributeReg = /^[ ]+([a-zA-Z0-9:@\-]+=[^> ]+)/;
+// const attributeReg = /^[ ]+([a-zA-Z0-9:@\-]+=[^> ]+)/;
+const attributeReg = /^[ ]+([a-zA-Z0-9:@\-]+=['"][^'"]+['"])/;
 const doctypeReg = /<!doctype[^>]*>/;
 const commentReg = /<!\-\-([^-->]+)\-\->/;
 
@@ -44,7 +45,6 @@ function parseHtml(html) {
                         text: '',
                         attributes: [],
                         children: [],
-
                     }
                     currNode.children.push(tag);
                     advance(startTagMatch[1].length + 1);
@@ -73,6 +73,6 @@ function parseHtml(html) {
     return ast.children[0];
 }
 
-export default parseHtml;
+// export default parseHtml;
 
-// module.exports = parseHtml;
+module.exports = parseHtml;

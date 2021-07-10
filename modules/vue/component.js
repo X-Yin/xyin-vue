@@ -6,6 +6,7 @@ import { pushTarget, popTarget } from "./reactive/dep";
 import Observer from "./reactive/observer";
 import eventStore from './eventBus';
 import patch from './patch';
+import { handleJsExpression } from './utils';
 
 export class Component {
     style = '';
@@ -28,7 +29,7 @@ export class Component {
         // 将 options 里面的属性打平到 Component 实例中
         Object.assign(this, {
             ...options,
-            data: new Observer(options.data).target
+            data: new Observer(options.data).target,
         });
 
     }
@@ -75,12 +76,11 @@ export class Component {
             const {key, value} = attribute; // key :prop value data.a.b
             if (key.match(propsReg)) {
                 let propsKey = key.match(propsReg)[1];
-                const vals = value.split('.');
-                let val;
-                vals.forEach(k => {
-                    val = this.parentNode[k];
-                });
-                this.proxyContext.props[propsKey] = val;
+                let val = handleJsExpression(value, this.parentNode);
+                // 只在子组件里面显式声明的 props 才被注入
+                if (this.proxyContext.propKeys.includes(propsKey)) {
+                    this.proxyContext.props[propsKey] = val;
+                }
             }
 
             if (key.match(eventReg)) { // {key: '@customClick', value:'clickHandler'}
@@ -153,8 +153,13 @@ function handleTemplate(template) {
 }
 
 function normalizeOptions(options) {
+    if (Array.isArray(options.props)) {
+        options.propKeys = options.props;
+        options.props = {};
+    }
     if (!options.props) {
         options.props = {};
+        options.propKeys = [];
     }
     if (!options.data) {
         options.data = {};

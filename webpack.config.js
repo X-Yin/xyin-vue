@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'production',
-    entry: path.resolve(__dirname, './src/demo/index.js'),
+    entry: path.resolve(__dirname, './src/index.js'),
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist')
@@ -16,17 +16,20 @@ module.exports = {
             },
             {
                 test: /\.js$/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: [
-                                '@babel/preset-env'
-                            ]
-                        },
-                        ident: "babel-loader-options"
-                    }
-                ],
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        '@babel/preset-env'
+                    ],
+                    // plugins: [ // 删除 babel 编译过后的 use strict
+                    //     [
+                    //         require("@babel/plugin-transform-modules-commonjs"),
+                    //         {
+                    //             strictMode: false
+                    //         }
+                    //     ],
+                    // ]
+                },
             }
         ]
     },
@@ -35,7 +38,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, './src/demo/index.html'),
+            template: path.resolve(__dirname, './public/index.html'),
             minify: false
         })
     ]

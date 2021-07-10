@@ -2,11 +2,13 @@
 
 function patch(oldDom, newDom) {
 
+    if (oldDom instanceof HTMLInputElement) {
+        console.log(oldDom, newDom);
+    }
     const nodeTypeOld = oldDom.nodeType;
     const nodeTypeNew = newDom.nodeType;
     if(nodeTypeOld !== nodeTypeNew) {
         const cloneNode = newDom.cloneNode(true);
-        console.log(oldDom, newDom);
         oldDom.parentNode.replaceChild(cloneNode, oldDom);
         return;
     }
@@ -26,13 +28,30 @@ function patch(oldDom, newDom) {
         return;
     }
     if (oldDom.attributes.length === newDom.attributes.length) {
-        const attrsOld = oldDom.attributes;
-        const attrsNew = newDom.attributes;
+        let attrsOld = oldDom.attributes;
+        let attrsNew = newDom.attributes;
+
+        // 先比对 attr- 表示的 html 原生属性，这种不需要替换 node，只需要动态的设置属性值即可，比如 input.value
+        for (let i = 0; i < attrsNew.length; i++) {
+            const attr = attrsNew[i];
+            const nodeName = attr.nodeName;
+            if (nodeName.startsWith('attr-')) {
+                const k = nodeName.replace('attr-', '');
+                if (attr.nodeValue !== oldDom[k]) {
+                    oldDom[k] = attr.nodeValue;
+                }
+                // oldDom.setAttribute(nodeName, attr.nodeValue);
+            }
+        }
+
         for (let i = 0; i < oldDom.attributes.length; i++) {
             const nodeNameOld = attrsOld[i].nodeName;
             const nodeNameNew = attrsNew[i].nodeName;
             const nodeValueOld = attrsOld[i].nodeValue;
             const nodeValueNew = attrsNew[i].nodeValue;
+            if (nodeNameOld.startsWith('attr-')) {
+                continue;
+            }
             if (nodeNameOld !== nodeNameNew || nodeValueOld !== nodeValueNew) {
                 const cloneNode = newDom.cloneNode(true);
                 oldDom.parentNode.replaceChild(cloneNode, oldDom);

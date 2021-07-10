@@ -9,8 +9,28 @@ class Observer {
     dep = {};
     constructor(target) {
         this.dep = new Dep();
-        this.target = defineReactive(target, this.dep);
+        // this.target = defineReactive(target, this.dep);
+        // 进行深度遍历，因为 proxy 不能实现深度监听
+        this.target = deepProxy(target, this.dep);
     }
+}
+
+function addProxy (target, dep) {
+    const proxy = defineReactive(target, dep);
+    if (typeof target === 'object') {
+        Object.keys(target).forEach(key => {
+            const val = target[key];
+            if (typeof val === 'object') {
+                proxy[key] = addProxy(val, dep);
+            }
+        })
+    }
+    return proxy;
+}
+
+
+function deepProxy(target, dep) {
+    return addProxy(target, dep);
 }
 
 function defineReactive(target, dep) {
