@@ -1,10 +1,6 @@
 
 
 function patch(oldDom, newDom) {
-
-    if (oldDom instanceof HTMLInputElement) {
-        console.log(oldDom, newDom);
-    }
     const nodeTypeOld = oldDom.nodeType;
     const nodeTypeNew = newDom.nodeType;
     if(nodeTypeOld !== nodeTypeNew) {
