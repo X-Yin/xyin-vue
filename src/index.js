@@ -1,5 +1,4 @@
 import App from './App.vue';
-
 import Vue from '../modules/vue';
 
 const vm = new Vue({

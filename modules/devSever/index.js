@@ -7,5 +7,7 @@ app.use(express.static(path.resolve(__dirname, '../../dist')));
 
 app.listen(3005, () => {
     console.log('server running at http://localhost:3005');
-    open('http://localhost:3005');
+    setTimeout(() => {
+        open('http://localhost:3005');
+    }, 2000);
 });
