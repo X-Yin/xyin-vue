@@ -13,7 +13,8 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
 
     if (type === 'template') {
         const templateMatch = source.match(template)[1];
-        const code = `const template = '${templateMatch}'; export default template;`;
+        const code = `const template = "${templateMatch}"; export default template;`;
+        // const code = 'const template = `' + templateMatch + '`;export default template;';
         return code;
     }
 

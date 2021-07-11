@@ -49,8 +49,9 @@ function patch(oldDom, newDom) {
                 continue;
             }
             if (nodeNameOld !== nodeNameNew || nodeValueOld !== nodeValueNew) {
-                const cloneNode = newDom.cloneNode(true);
-                oldDom.parentNode.replaceChild(cloneNode, oldDom);
+                // const cloneNode = newDom.cloneNode(true);
+                // oldDom.parentNode.replaceChild(cloneNode, oldDom);
+                oldDom.parentNode.replaceChild(newDom, oldDom);
                 return;
             }
         }
@@ -61,8 +62,9 @@ function patch(oldDom, newDom) {
             const nodeOld = childNodesOld[i];
             const nodeNew = childNodesNew[i];
             if (!nodeOld && nodeNew) {
-                const cloneNode = nodeNew.cloneNode(true);
-                oldDom.appendChild(cloneNode);
+                // const cloneNode = nodeNew.cloneNode(true);
+                // oldDom.appendChild(cloneNode);
+                oldDom.appendChild(nodeNew);
             }
             if (!nodeNew && nodeOld) {
                 oldDom.removeChild(nodeOld);
