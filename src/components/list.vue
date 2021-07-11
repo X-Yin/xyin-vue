@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="item-wrapper" v-for="(item, index) in todoList">
-      <div @click="complete" class="done-btn" data-index="{{index}}"></div>
+      <div class="done-btn" @click="complete" data-index="{{index}}"></div>
       <div class="item-content">{{item}}</div>
     </div>
   </div>
