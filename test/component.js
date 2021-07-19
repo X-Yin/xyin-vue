@@ -1,4 +1,7 @@
-const content = `<div :class='flag ? "hello" : "world"'>women</div>`
+const parse = require('../modules/vue-loader/htmlParser');
+const fs = require('fs');
+const path = require('path');
 
-const template = 'const temp = `' + content + '`;';
-console.log(template);
+const content = fs.readFileSync(path.resolve(__dirname, './index1.html'));
+const result = parse(content);
+console.log(JSON.stringify(result, null, 4));
