@@ -1,4 +1,4 @@
-import parse from '../vue-loader/parse';
+import parse from '../vue-loader/htmlParser';
 import createNode from "./createNode";
 import proxy from './proxy';
 import Watcher from "./reactive/watcher";
@@ -66,14 +66,14 @@ export class Component {
     }
 
     // 为 component 加载 props
-    initParentContext(attributes) {
+    initParentContext(attributes = []) {
         // 以 : 开头的 props
         const propsReg = /^:([0-9a-zA-Z\-]+$)/;
         // 以 @ 开头的事件
         const eventReg = /^@([0-9a-zA-Z\-]+$)/;
         // [{key, value}, {}, {}]
-        attributes.forEach((attribute) => {
-            const {key, value} = attribute; // key :prop value data.a.b
+        Object.entries(attributes).forEach((attribute) => {
+            const [key, value] = attribute; // key :prop value data.a.b
             if (key.match(propsReg)) {
                 let propsKey = key.match(propsReg)[1];
                 let val = handleJsExpression(value, this.parentNode);
@@ -93,20 +93,29 @@ export class Component {
 
     createElement(attributes) {
         let dom;
-        try {
-            this.created();
-            pushTarget(this.watcher);
-            if (attributes) {
-                this.initParentContext(attributes);
-            }
-            dom = createNode(this.ast, this.proxyContext);
-            this.handleStyle();
-            this.mounted();
-        } catch(err) {
-            throw new Error(`component ${this.name || this.id} mount error ${err.message}`);
-        } finally {
-            popTarget();
+        this.created();
+        pushTarget(this.watcher);
+        if (attributes) {
+            this.initParentContext(attributes);
         }
+        dom = createNode(this.ast, this.proxyContext);
+        this.handleStyle();
+        this.mounted();
+        popTarget();
+        // try {
+        //     this.created();
+        //     pushTarget(this.watcher);
+        //     if (attributes) {
+        //         this.initParentContext(attributes);
+        //     }
+        //     dom = createNode(this.ast, this.proxyContext);
+        //     this.handleStyle();
+        //     this.mounted();
+        // } catch(err) {
+        //     throw new Error(`component ${this.name || this.id} mount error ${err.message}`);
+        // } finally {
+        //     popTarget();
+        // }
         if (!this.oldDom) { // 说明是首次渲染，不是后期的数据更新导致的渲染
             this.oldDom = dom;
         }
@@ -149,7 +158,8 @@ function handleStyle(style) {
 }
 
 function handleTemplate(template) {
-    return parse(template);
+    template = template.trim();
+    return parse(template)[0];
 }
 
 function normalizeOptions(options) {

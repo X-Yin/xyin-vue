@@ -1,6 +1,14 @@
 <template>
   <div class="input-wrapper">
-    <input class="input" type="text" :value="value" :placeholder="placeholder" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur"></input>
+    <input
+          class="input"
+          type="text"
+          :value="value"
+          :placeholder="placeholder"
+          @input="onInput"
+          @keydown="onKeyDown"
+          @focus="onFocus"
+          @blur="onBlur"/>
     <div class="border" :style="borderStyle"></div>
   </div>
 </template>

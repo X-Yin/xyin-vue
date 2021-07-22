@@ -5,6 +5,7 @@ import Vue from "./index";
 export function handleDynamicNode(text, context) {
     const reg = /{{([^}]*)}}/;
     if (reg.test(text)) {
+        console.log(text);
         let matches;
         // 一个表达式里面可能有多个动态数据，需要逐个替换 {{name}}-{{age}}
         while(matches = text.match(reg)) {
@@ -20,20 +21,21 @@ export function handleDynamicNode(text, context) {
 
 
 export default function createNode(node, context) {
-    const { children, tagName: tagAlias, attributes, text } = node;
-    const tagName = tagAlias.toLowerCase();
-    // 如果 tagName 是 components 里面的某个组件，需要单独处理
-    const components = lowerCase(context.options.components);
-    if (components && components[tagName]) {
-        // return createNode(components[tagName], context);
-        const component = components[tagName];
-        component.parentNode = context;
-        return component.createElement(attributes);
+    const { name: tagAlias, attribs: attributes = [], type } = node;
+    if (tagAlias || type !== 'text') {
+        const tagName = tagAlias.toLowerCase();
+        // 如果 tagName 是 components 里面的某个组件，需要单独处理
+        const components = lowerCase(context.options.components);
+        if (components && components[tagName]) {
+            // return createNode(components[tagName], context);
+            const component = components[tagName];
+            component.parentNode = context;
+            return component.createElement(attributes);
+        }
     }
 
     // 这个地方需要先检测 attribute 里面有没有 vue 指令，如果有的话，需要执行钩子函数 createNode
     // 如果这个 create 有返回值的话，就直接 return 返回值，如果没有返回值的话，再走正常的创建流程
-
     const tag = executeDirectivesHook({
         attributes, hookName: 'createNode', node, context});
     if (tag) {
@@ -45,7 +47,15 @@ export default function createNode(node, context) {
 }
 
 export function createNormalNode(node, context) {
-    const { children, tagName: tagAlias, attributes, text } = node;
+    const { children = [], name: tagAlias, attribs: attributes = [], data: text, type } = node;
+
+    if (type === 'text') {
+        return document.createTextNode(handleDynamicNode(text, context));
+    }
+
+    if (tagAlias === undefined) {
+        console.log(node);
+    }
     const tagName = tagAlias.toLowerCase();
 
     // 常规创建 dom
@@ -55,21 +65,24 @@ export function createNormalNode(node, context) {
         attributes,
         context
     });
-    tag.innerText = handleDynamicNode(text, context);
     // tag.innerText = text;
     if (children.length) {
         for (const child of children) {
             const node = createNode(child, context);
             // 组件更新完成
-            executeDirectivesHook({attributes: child.attributes, hookName: 'updated', domNode: node})
+            if (node.nodeType !== 3) {
+                executeDirectivesHook({attributes: child.attributes, hookName: 'updated', domNode: node})
+            }
             // 对于 v-for 来说，返回的这个 node 是一个 documentFragment，被 appendChild 的时候，是所有的子节点被挂载
             tag.appendChild(node);
             // 组件已经被插入到父节点 inserted， 运行指令的钩子函数
-            (function(child, node) {
-                setTimeout(() => {
-                    executeDirectivesHook({attributes: child.attributes, hookName: 'inserted', domNode: node})
-                }, 20);
-            })(child, node)
+            if (node.nodeType !== 3) {
+                (function(child, node) {
+                    setTimeout(() => {
+                        executeDirectivesHook({attributes: child.attributes, hookName: 'inserted', domNode: node})
+                    }, 20);
+                })(child, node)
+            }
         }
     }
     return tag;
@@ -90,8 +103,8 @@ function lowerCase(data) {
 
 function handleAttribute({tag, attributes, context}) {
     // attributes: [{key: '@click', value: 'clickHandler'}]
-    attributes.forEach(attribute => {
-        const {key, value} = attribute;
+    Object.entries(attributes).forEach(attribute => {
+        const [key, value] = attribute;
         const eventReg = /^@([0-9a-zA-Z\-]+$)/;
         const valReg = /^:([0-9a-zA-Z\-]+$)/;
         if (eventReg.test(key)) {
