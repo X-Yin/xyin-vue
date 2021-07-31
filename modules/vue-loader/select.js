@@ -6,16 +6,24 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     const script = /<script>([\s\S]*)<\/script>/;
     const type = incomingQuery.type;
     if (type === 'style') {
-        const styleMatch = source.match(style)[1];
-        const code = `const style = '${styleMatch}'; export default style;`;
-        return code;
+        if (source.match(style)) {
+            const styleMatch = source.match(style)[1];
+            const code = `const style = '${styleMatch}'; export default style;`;
+            return code;
+        }
+        return '';
+
     }
 
     if (type === 'template') {
-        const templateMatch = source.match(template)[1];
-        const code = `const template = '${templateMatch}'; export default template;`;
-        // const code = 'const template = `' + templateMatch + '`;export default template;';
-        return code;
+        if (source.match(template)) {
+            const templateMatch = source.match(template)[1];
+            const code = `const template = '${templateMatch}'; export default template;`;
+            // const code = 'const template = `' + templateMatch + '`;export default template;';
+            return code;
+        }
+        return '';
+
     }
 
     if (type === 'script') {

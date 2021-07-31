@@ -6,7 +6,10 @@
   "scripts": {
     "build": "webpack --config webpack.config.js --watch",
     "dev": "node modules/devSever/index.js",
-    "start": "npm-run-all --parallel build dev"
+    "start": "npm-run-all --parallel build dev",
+    "build:test": "webpack --config test/src/webpack.config.js --watch",
+    "dev:test": "node modules/devSever/test.js",
+    "start:test": "npm-run-all --parallel build:test dev:test"
   },
   "dependencies": {
     "@babel/core": "^7.14.6",
