@@ -1,4 +1,5 @@
 import Dep from "./dep";
+import {isArray, isObject} from "../utils";
 
 /**
  * 传入的 target 是每一个组件里面的 data 响应式数据
@@ -17,13 +18,21 @@ class Observer {
 
 function addProxy (target, dep) {
     const proxy = defineReactive(target, dep);
-    if (typeof target === 'object') {
-        Object.keys(target).forEach(key => {
-            const val = target[key];
-            if (typeof val === 'object') {
-                proxy[key] = addProxy(val, dep);
-            }
-        })
+    if (isObject(target)) {
+        if (isArray(target)) {
+            target.forEach((item, index) => {
+                if (isObject(item)) {
+                    proxy[index] = addProxy(item, dep);
+                }
+            })
+        } else {
+            Object.keys(target).forEach(key => {
+                const val = target[key];
+                if (isObject(val)) {
+                    proxy[key] = addProxy(val, dep);
+                }
+            })
+        }
     }
     return proxy;
 }

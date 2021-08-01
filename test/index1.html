@@ -1,4 +1,27 @@
-<template>
-    <input type="text" @click="clickHandler" :data="data"/>
-    <div id="app">hello</div>
-</template>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="app"></div>
+<script>
+    const arr = [1, 2, 3];
+    const pro = new Proxy(arr, {
+        get(target, propertyKey, value) {
+            return target[propertyKey];
+        },
+        set(target, propertyKey, value) {
+            target[propertyKey] = value;
+            return true;
+        }
+    });
+    console.log(pro);
+    console.log(pro.length);
+</script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 <template>
   <div class="app">
     <h1>App</h1>
-    <componenta/>
+    <componenta :message="mes1" @changeMessage="changeMessage1"/>
+    <componenta :message="mes2" @changeMessage="changeMessage2"/>
   </div>
 </template>
 
@@ -15,6 +16,19 @@ export default {
   },
   data() {
     return {
+      mes1: 'hello',
+      mes2: 'world'
+    }
+  },
+  methods: {
+    changeMessage1(msg) {
+      console.log('message1', msg);
+      this.mes1 = msg;
+      console.log('this.mes1', this.mes1);
+    },
+    changeMessage2(msg) {
+      console.log('message2', msg);
+      this.mes2 = msg;
     }
   },
   components: {

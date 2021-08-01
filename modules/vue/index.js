@@ -15,7 +15,9 @@ export default class Vue {
      }
 
      createElement(componentInstance) {
-         this.domTree = componentInstance.createElement();
+         // console.log(componentInstance.vNodeInstance);
+         this.domTree = componentInstance.createVNode().createElement();
+
      }
 
      mount(el) {

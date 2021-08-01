@@ -1,16 +1,43 @@
 <template>
   <div class="A">
-    <h2>A</h2>
-    <b/>
+    <div v-for="(item, index) in todoList">
+      <div>{{item}}-{{index}}</div>
+    </div>
   </div>
 </template>
 
 <script>
-import B from './B.vue';
 export default {
   name: 'A',
-  components: {
-    B
+  props: ['message'],
+  data() {
+    return {
+      count: 1,
+      flag: false,
+      todoList: [1, 2, 3]
+    }
+  },
+  mounted() {
+  },
+  methods: {
+    toggleFlag() {
+      this.flag = !this.flag;
+    },
+    changeMessage() {
+      this.trigger('changeMessage', this.count++ + ":" + this.message);
+    },
+    changeName() {
+      this.count++;
+    }
   }
 }
 </script>
+
+<style>
+.a {
+  color: red;
+}
+.b {
+  color: orange;
+}
+</style>

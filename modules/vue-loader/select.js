@@ -8,7 +8,8 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     if (type === 'style') {
         if (source.match(style)) {
             const styleMatch = source.match(style)[1];
-            const code = `const style = '${styleMatch}'; export default style;`;
+            const result = normalizeQuote(styleMatch);
+            const code = `const style = "${result}"; export default style;`;
             return code;
         }
         return '';
@@ -18,8 +19,8 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     if (type === 'template') {
         if (source.match(template)) {
             const templateMatch = source.match(template)[1];
-            const code = `const template = '${templateMatch}'; export default template;`;
-            // const code = 'const template = `' + templateMatch + '`;export default template;';
+            const result = normalizeQuote(templateMatch);
+            const code = `const template = "${result}"; export default template;`;
             return code;
         }
         return '';
@@ -27,8 +28,19 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     }
 
     if (type === 'script') {
+        console.log('-----------------');
+        console.log(source.match(script)[1]);
+        console.log('-----------------');
         loaderContext.callback(null, source.match(script)[1]);
     }
+}
+
+function normalizeQuote(str) {
+    const reg = /(["])/g;
+    if (reg.test(str)) {
+        str = str.replace(reg, `\\${RegExp.$1}`);
+    }
+    return str;
 }
 
 module.exports = select;

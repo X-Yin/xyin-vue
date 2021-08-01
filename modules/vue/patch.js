@@ -1,4 +1,4 @@
-
+import { handleJsExpression, normalizeClassName } from "./utils";
 
 function patch(oldDom, newDom) {
     const nodeTypeOld = oldDom.nodeType;
@@ -33,10 +33,11 @@ function patch(oldDom, newDom) {
             const nodeName = attr.nodeName;
             if (nodeName.startsWith('attr-')) {
                 const k = nodeName.replace('attr-', '');
-                if (attr.nodeValue !== oldDom[k]) {
+                if (k === 'class') { // 对于 class 类名要单独处理，class 中可能是对象或者数组的写法，而且不能直接赋值 dom.class = 'className'
+                    oldDom.className = normalizeClassName(attr.nodeValue);
+                } else if (attr.nodeValue !== oldDom[k]) {
                     oldDom[k] = attr.nodeValue;
                 }
-                // oldDom.setAttribute(nodeName, attr.nodeValue);
             }
         }
 

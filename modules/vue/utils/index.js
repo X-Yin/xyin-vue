@@ -13,3 +13,39 @@ export function handleJsExpression(code, sandbox) {
     });
     return fn(proxy);
 }
+
+export function lowerCase(data) {
+    if (typeof data === 'object' && data !== null) {
+        const obj = {};
+        Object.entries(data).forEach(item => {
+            const [key, value] = item;
+            obj[key.toLowerCase()] = value;
+        });
+        return obj;
+    } else if (typeof data === 'string') {
+        return data.toLowerCase();
+    }
+}
+
+export function normalizeClassName(classNames, context) {
+    if (classNames === null) {
+        return '';
+    }
+    if (typeof classNames !== 'object') {
+        return classNames;
+    }
+    if (Array.isArray(classNames)) {
+        const result = classNames.map(item => {
+        });
+    }
+}
+
+export function isObject(obj) {
+    return obj && typeof obj === 'object';
+}
+
+export function isArray(arr) {
+    return Array.isArray(arr);
+}
+
+export * from './deepClone';

@@ -1,11 +1,10 @@
-import { handleJsExpression } from "./utils";
+import { handleJsExpression, normalizeClassName } from "./utils";
 import { extractDirectivesFromAttribute, executeDirectivesHook } from "./directives";
 import Vue from "./index";
 
 export function handleDynamicNode(text, context) {
     const reg = /{{([^}]*)}}/;
     if (reg.test(text)) {
-        console.log(text);
         let matches;
         // 一个表达式里面可能有多个动态数据，需要逐个替换 {{name}}-{{age}}
         while(matches = text.match(reg)) {
@@ -15,23 +14,31 @@ export function handleDynamicNode(text, context) {
             const val = handleJsExpression(key, context);
             text = text.replace(matches[0], val);
         }
+    } else {
+        try {
+            const result = handleJsExpression(text, context);
+            if (result) {
+                return result;
+            }
+        } catch(e) {
+        }
     }
     return text;
 }
 
 
 export default function createNode(node, context) {
-    const { name: tagAlias, attribs: attributes = [], type } = node;
-    if (tagAlias || type !== 'text') {
-        const tagName = tagAlias.toLowerCase();
-        // 如果 tagName 是 components 里面的某个组件，需要单独处理
-        const components = lowerCase(context.options.components);
-        if (components && components[tagName]) {
-            // return createNode(components[tagName], context);
-            const component = components[tagName];
-            component.parentNode = context;
-            return component.createElement(attributes);
-        }
+    const {
+        name: tagAlias,
+        attribs: attributes = {},
+        type,
+        data // 在 type 为 vnode 的时候，是一个 vnode 的实例
+    } = node;
+    if (tagAlias && type === 'vnode') {
+
+        data.parentNode = context;
+        data.propsAttributes = attributes;
+        return data.createElement();
     }
 
     // 这个地方需要先检测 attribute 里面有没有 vue 指令，如果有的话，需要执行钩子函数 createNode
@@ -53,9 +60,6 @@ export function createNormalNode(node, context) {
         return document.createTextNode(handleDynamicNode(text, context));
     }
 
-    if (tagAlias === undefined) {
-        console.log(node);
-    }
     const tagName = tagAlias.toLowerCase();
 
     // 常规创建 dom
@@ -88,19 +92,6 @@ export function createNormalNode(node, context) {
     return tag;
 }
 
-function lowerCase(data) {
-    if (typeof data === 'object' && data !== null) {
-        const obj = {};
-        Object.entries(data).forEach(item => {
-            const [key, value] = item;
-            obj[key.toLowerCase()] = value;
-        });
-        return obj;
-    } else if (typeof data === 'string') {
-        return data.toLowerCase();
-    }
-}
-
 function handleAttribute({tag, attributes, context}) {
     // attributes: [{key: '@click', value: 'clickHandler'}]
     Object.entries(attributes).forEach(attribute => {
@@ -114,12 +105,20 @@ function handleAttribute({tag, attributes, context}) {
             tag.addEventListener(eventKey, val);
         } else if(valReg.test(key)) {
             const valKey = key.match(valReg)[1];
-            const val = context[value];
+            const val = handleDynamicNode(value, context);
             // 如果是普通 dom 元素的属性，直接将该属性设置为 dom 节点的属性
             // e.g. <input :value="message"> 需要直接设置 input.value 为 message 对应的值
             tag[valKey] = val;
             // 因为 vue 里面有自己的 vNode，这里是直接用的 dom 的 node，所以先设置一些假属性和原本的 html 属性区分开
+            // 为了给后面的 patch 做 diff 用
             tag.setAttribute(`attr-${valKey}`, val);
+
+            if (valKey === 'class') { // 对于 class 类名要单独处理，class 中可能是对象或者数组的写法，而且不能直接赋值 dom.class = 'className'
+                tag.className = normalizeClassName(val);
+            } else {
+                tag[valKey] = val;
+            }
+
         } else {
             const val = handleDynamicNode(value, context);
             tag.setAttribute(key, val);
