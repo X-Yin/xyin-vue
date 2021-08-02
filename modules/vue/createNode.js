@@ -2,7 +2,7 @@ import { handleJsExpression, normalizeClassName } from "./utils";
 import { extractDirectivesFromAttribute, executeDirectivesHook } from "./directives";
 import Vue from "./index";
 
-export function handleDynamicNode(text, context) {
+export function handleDynamicNode(text, context, isAttribute = false) {
     const reg = /{{([^}]*)}}/;
     if (reg.test(text)) {
         let matches;
@@ -14,7 +14,7 @@ export function handleDynamicNode(text, context) {
             const val = handleJsExpression(key, context);
             text = text.replace(matches[0], val);
         }
-    } else {
+    } else if (isAttribute) {
         try {
             const result = handleJsExpression(text, context);
             if (result) {
@@ -105,7 +105,7 @@ function handleAttribute({tag, attributes, context}) {
             tag.addEventListener(eventKey, val);
         } else if(valReg.test(key)) {
             const valKey = key.match(valReg)[1];
-            const val = handleDynamicNode(value, context);
+            const val = handleDynamicNode(value, context, true);
             // 如果是普通 dom 元素的属性，直接将该属性设置为 dom 节点的属性
             // e.g. <input :value="message"> 需要直接设置 input.value 为 message 对应的值
             tag[valKey] = val;
@@ -120,7 +120,7 @@ function handleAttribute({tag, attributes, context}) {
             }
 
         } else {
-            const val = handleDynamicNode(value, context);
+            const val = handleDynamicNode(value, context, true);
             tag.setAttribute(key, val);
         }
     });

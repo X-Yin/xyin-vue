@@ -1,8 +1,13 @@
 <template>
   <div class="A">
-    <div v-for="(item, index) in todoList">
-      <div>{{item}}-{{index}}</div>
-    </div>
+    <input type="text" :value="value" @input="onInput">
+    <p>value: {{value}}</p>
+    <li v-for="item in todoList">
+      {{item}}
+    </li>
+    <p>
+      <button @click="addList">addList</button>
+    </p>
   </div>
 </template>
 
@@ -14,12 +19,21 @@ export default {
     return {
       count: 1,
       flag: false,
+      value: 'hello',
       todoList: [1, 2, 3]
     }
   },
   mounted() {
   },
   methods: {
+    addList() {
+      const num = this.todoList.length + 1;
+      this.todoList = [...this.todoList, num];
+    },
+    onInput(e) {
+      console.log(e);
+      this.value = e.target.value;
+    },
     toggleFlag() {
       this.flag = !this.flag;
     },

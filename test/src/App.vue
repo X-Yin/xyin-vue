@@ -2,8 +2,7 @@
   <div class="app">
     <h1>App</h1>
     <componenta :message="mes1" @changeMessage="changeMessage1"/>
-    <componenta :message="mes2" @changeMessage="changeMessage2"/>
-  </div>
+  </div>x
 </template>
 
 <script>
