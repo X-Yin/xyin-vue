@@ -5,6 +5,7 @@
     <li v-for="item in todoList">
       {{item}}
     </li>
+    <p>{{obj.name}}</p>
     <p>
       <button @click="addList">addList</button>
     </p>
@@ -20,15 +21,19 @@ export default {
       count: 1,
       flag: false,
       value: 'hello',
-      todoList: [1, 2, 3, 4]
+      todoList: [1, 2, 3, 4],
+      obj: {
+        name: 'jack'
+      }
     }
   },
   mounted() {
   },
   methods: {
     addList() {
+      console.log(1234);
       const num = this.todoList.length + 1;
-      this.todoList = [...this.todoList, num];
+      this.todoList.push(num);
     },
     onInput(e) {
       console.log(e);

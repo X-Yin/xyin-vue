@@ -32,7 +32,7 @@ class VNode {
             data: new Observer(options.data).target,
         });
         this.vnode = this.transformAst2VNode();
-        console.log(this);
+        console.log('>>>> ctor', this);
     }
 
     created() {
@@ -61,6 +61,10 @@ class VNode {
     updateVNode() {
         const oldDom = this.proxyContext.oldDom;
         let newDom = this.proxyContext.createElement();
+        console.log(oldDom);
+        console.log(newDom);
+        console.log(this);
+        console.log('>>>>>>>>');
         // oldDom 不可再重新赋值，因为已经在 dom 树中被渲染过了，只能动态的增删，不能重新赋值
         patch(oldDom, newDom);
         newDom = null;

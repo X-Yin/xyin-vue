@@ -52,6 +52,7 @@ function defineReactive(target, dep) {
         },
         set(target, propertyKey, value) {
             const oldVal = target[propertyKey];
+            debugger;
             if (oldVal !== value) {
                 target[propertyKey] = value;
                 dep.notify();
