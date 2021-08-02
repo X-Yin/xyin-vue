@@ -20,7 +20,7 @@ export default {
       count: 1,
       flag: false,
       value: 'hello',
-      todoList: [1, 2, 3]
+      todoList: [1, 2, 3, 4]
     }
   },
   mounted() {
