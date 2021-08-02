@@ -1,14 +1,14 @@
 <template>
   <div class="A">
-    <input type="text" :value="value" @input="onInput">
-    <p>value: {{value}}</p>
+    <input
+        type="text"
+        :value="value"
+        @input="onInput"
+        @keydown="onKeyDown"
+        placeholder="please input content...">
     <li v-for="item in todoList">
       {{item}}
     </li>
-    <p>{{obj.name}}</p>
-    <p>
-      <button @click="addList">addList</button>
-    </p>
   </div>
 </template>
 
@@ -20,8 +20,11 @@ export default {
     return {
       count: 1,
       flag: false,
-      value: 'hello',
-      todoList: [1, 2, 3, 4],
+      value: '',
+      todoList: [
+          'todo1',
+          'todo2'
+      ],
       obj: {
         name: 'jack'
       }
@@ -31,16 +34,17 @@ export default {
   },
   methods: {
     addList() {
-      console.log(1234);
       const num = this.todoList.length + 1;
       this.todoList.push(num);
     },
-    onInput(e) {
-      console.log(e);
-      this.value = e.target.value;
+    onKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.todoList.push(this.value);
+        this.value = '';
+      }
     },
-    toggleFlag() {
-      this.flag = !this.flag;
+    onInput(e) {
+      this.value = e.target.value;
     },
     changeMessage() {
       this.trigger('changeMessage', this.count++ + ":" + this.message);

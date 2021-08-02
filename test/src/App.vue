@@ -1,6 +1,5 @@
 <template>
   <div class="app">
-    <h1>App</h1>
     <componenta :message="mes1" @changeMessage="changeMessage1"/>
   </div>x
 </template>

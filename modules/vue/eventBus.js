@@ -10,7 +10,11 @@ class EventBus {
             throw new Error('on has no callback');
         }
         if (Array.isArray(this.store[eventName])) {
-            this.store[eventName].push(callback);
+            const index = this.store[eventName].indexOf(callback);
+            console.log('>>>>> eventBus index', index);
+            if (index < 0) {
+                this.store[eventName].push(callback);
+            }
         } else {
             this.store[eventName] = [callback];
         }

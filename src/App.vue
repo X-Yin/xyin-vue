@@ -29,6 +29,7 @@ export default {
   methods: {
     addItem(value) {
       this.todoList.unshift(value);
+      console.log('>> this.todoList', this.todoList, value);
     },
     onComplete(index) {
       this.todoList.splice(parseInt(index), 1);

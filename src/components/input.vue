@@ -36,6 +36,7 @@
       },
       onKeyDown(e) {
         if (e.keyCode === 13) {
+          console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
           this.trigger('input', this.value);
           this.value = '';
         }

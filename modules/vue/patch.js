@@ -4,8 +4,9 @@ function patch(oldDom, newDom) {
     const nodeTypeOld = oldDom.nodeType;
     const nodeTypeNew = newDom.nodeType;
     if(nodeTypeOld !== nodeTypeNew) {
-        const cloneNode = newDom.cloneNode(true);
-        oldDom.parentNode.replaceChild(cloneNode, oldDom);
+        // const cloneNode = newDom.cloneNode(true);
+        oldDom.parentNode.replaceChild(newDom, oldDom);
+        oldDom = null;
         return;
     }
 
@@ -19,8 +20,9 @@ function patch(oldDom, newDom) {
     const tagName1 = oldDom.tagName;
     const tagName2 = newDom.tagName;
     if (tagName1 !== tagName2) {
-        const cloneNode = newDom.cloneNode(true);
-        oldDom.parentNode.replaceChild(cloneNode, oldDom);
+        // const cloneNode = newDom.cloneNode(true);
+        oldDom.parentNode.replaceChild(newDom, oldDom);
+        oldDom = null;
         return;
     }
     if (oldDom.attributes.length === newDom.attributes.length) {
@@ -53,6 +55,7 @@ function patch(oldDom, newDom) {
                 // const cloneNode = newDom.cloneNode(true);
                 // oldDom.parentNode.replaceChild(cloneNode, oldDom);
                 oldDom.parentNode.replaceChild(newDom, oldDom);
+                oldDom = null;
                 return;
             }
         }
@@ -60,7 +63,7 @@ function patch(oldDom, newDom) {
         const childNodesNew = newDom.childNodes;
         const maxLength = Math.max(childNodesOld.length, childNodesNew.length);
         for (let i = 0; i < maxLength; i++) {
-            const nodeOld = childNodesOld[i];
+            let nodeOld = childNodesOld[i];
             const nodeNew = childNodesNew[i];
             if (!nodeOld && nodeNew) {
                 // const cloneNode = nodeNew.cloneNode(true);
@@ -69,14 +72,16 @@ function patch(oldDom, newDom) {
             }
             if (!nodeNew && nodeOld) {
                 oldDom.removeChild(nodeOld);
+                nodeOld = null;
             }
             if (nodeOld && nodeNew) {
                 patch(nodeOld, nodeNew);
             }
         }
     } else {
-        const cloneNode = newDom.cloneNode(true);
-        oldDom.parentNode.replaceChild(cloneNode, oldDom);
+        // const cloneNode = newDom.cloneNode(true);
+        oldDom.parentNode.replaceChild(newDom, oldDom);
+        oldDom = null;
         return;
     }
 }

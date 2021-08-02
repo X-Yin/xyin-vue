@@ -2,7 +2,7 @@ import { handleJsExpression, normalizeClassName } from "./utils";
 import { extractDirectivesFromAttribute, executeDirectivesHook } from "./directives";
 import Vue from "./index";
 
-export function handleDynamicNode(text, context, isAttribute = false) {
+export function handleDynamicNode(text, context, isDynamicAttr = false) {
     const reg = /{{([^}]*)}}/;
     if (reg.test(text)) {
         let matches;
@@ -14,12 +14,9 @@ export function handleDynamicNode(text, context, isAttribute = false) {
             const val = handleJsExpression(key, context);
             text = text.replace(matches[0], val);
         }
-    } else if (isAttribute) {
+    } else if (isDynamicAttr) {
         try {
-            const result = handleJsExpression(text, context);
-            if (result) {
-                return result;
-            }
+            return handleJsExpression(text, context);
         } catch(e) {
         }
     }
@@ -96,6 +93,12 @@ function handleAttribute({tag, attributes, context}) {
     // attributes: [{key: '@click', value: 'clickHandler'}]
     Object.entries(attributes).forEach(attribute => {
         const [key, value] = attribute;
+
+        // 忽略 v- 指令的 attr
+        if (key.startsWith('v-')) {
+            return;
+        }
+
         const eventReg = /^@([0-9a-zA-Z\-]+$)/;
         const valReg = /^:([0-9a-zA-Z\-]+$)/;
         if (eventReg.test(key)) {
@@ -120,8 +123,8 @@ function handleAttribute({tag, attributes, context}) {
             }
 
         } else {
-            const val = handleDynamicNode(value, context, true);
-            tag.setAttribute(key, val);
+            // const val = handleDynamicNode(value, context, true);
+            tag.setAttribute(key, value);
         }
     });
 }

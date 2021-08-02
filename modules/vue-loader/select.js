@@ -28,9 +28,6 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     }
 
     if (type === 'script') {
-        console.log('-----------------');
-        console.log(source.match(script)[1]);
-        console.log('-----------------');
         loaderContext.callback(null, source.match(script)[1]);
     }
 }

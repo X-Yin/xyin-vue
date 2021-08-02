@@ -32,7 +32,6 @@ export function handleVForExpression(node, context, expression) {
         const index = match[2];
         const arrKey = match[3];
         const arr = context[arrKey];
-        // debugger;
         for (let i = 0; i < arr.length; i++) {
             try {
                 context[item] = arr[i];

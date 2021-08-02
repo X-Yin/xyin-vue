@@ -1,5 +1,5 @@
 import Dep from "./dep";
-import {isArray, isObject} from "../utils";
+import { isArray, isObject } from "../utils";
 
 /**
  * 传入的 target 是每一个组件里面的 data 响应式数据
@@ -52,7 +52,6 @@ function defineReactive(target, dep) {
         },
         set(target, propertyKey, value) {
             const oldVal = target[propertyKey];
-            debugger;
             if (oldVal !== value) {
                 target[propertyKey] = value;
                 dep.notify();
