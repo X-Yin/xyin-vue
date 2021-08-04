@@ -24,17 +24,20 @@ export function handleDynamicNode(text, context, isDynamicAttr = false) {
 }
 
 
-export default function createNode(node, context) {
+export default function createNode(node, context, isFirstRender = false) {
     const {
         name: tagAlias,
         attribs: attributes = {},
         type,
-        data // 在 type 为 vnode 的时候，是一个 vnode 的实例
+        data // 在 type 为 vnode 的时候，data 为 vnode 的实例
     } = node;
     if (tagAlias && type === 'vnode') {
 
         data.parentNode = context;
         data.propsAttributes = attributes;
+        if (isFirstRender) {
+            return data.execLifeCycle();
+        }
         return data.createElement();
     }
 
@@ -47,10 +50,10 @@ export default function createNode(node, context) {
     }
 
     // 常规创建 dom
-    return createNormalNode(node, context);
+    return createNormalNode(node, context,isFirstRender);
 }
 
-export function createNormalNode(node, context) {
+export function createNormalNode(node, context, isFirstRender = false) {
     const { children = [], name: tagAlias, attribs: attributes = [], data: text, type } = node;
 
     if (type === 'text') {
@@ -69,7 +72,7 @@ export function createNormalNode(node, context) {
     // tag.innerText = text;
     if (children.length) {
         for (const child of children) {
-            const node = createNode(child, context);
+            const node = createNode(child, context, isFirstRender);
             // 组件更新完成
             if (node.nodeType !== 3) {
                 executeDirectivesHook({attributes: child.attributes, hookName: 'updated', domNode: node})
@@ -114,10 +117,11 @@ function handleAttribute({tag, attributes, context}) {
             tag[valKey] = val;
             // 因为 vue 里面有自己的 vNode，这里是直接用的 dom 的 node，所以先设置一些假属性和原本的 html 属性区分开
             // 为了给后面的 patch 做 diff 用
-            tag.setAttribute(`attr-${valKey}`, val);
+            const className = normalizeClassName(val, context)
+            tag.setAttribute(`attr-${valKey}`, className);
 
             if (valKey === 'class') { // 对于 class 类名要单独处理，class 中可能是对象或者数组的写法，而且不能直接赋值 dom.class = 'className'
-                tag.className = normalizeClassName(val);
+                tag.className = className;
             } else {
                 tag[valKey] = val;
             }

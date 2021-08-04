@@ -8,20 +8,26 @@
     <title>Document</title>
 </head>
 <body>
-<div id="app"></div>
+<div id="app">
+    <button id="button">button</button>
+</div>
 <script>
-    const arr = [1, 2, 3];
-    const pro = new Proxy(arr, {
-        get(target, propertyKey, value) {
-            return target[propertyKey];
-        },
-        set(target, propertyKey, value) {
-            target[propertyKey] = value;
-            return true;
+    document.getElementById('button').addEventListener('click', throttle(a));
+    function throttle(func, timeout = 16) {
+        let timer = null;
+        return function() {
+            if (timer) {
+                return;
+            }
+            timer = setTimeout(() => {
+                func();
+                timer = null;
+            }, timeout);
         }
-    });
-    console.log(pro);
-    console.log(pro.length);
+    }
+    function a() {
+        console.log(1234);
+    }
 </script>
 </body>
 </html>

@@ -32,6 +32,7 @@ function select(incomingQuery, loaderContext, source, sourcemap) {
     }
 }
 
+// 只对双引号转义
 function normalizeQuote(str) {
     const reg = /(["])/g;
     if (reg.test(str)) {

@@ -2,7 +2,7 @@
   <div class="container">
     <div class="item-wrapper" v-for="(item, index) in todoList">
       <div class="done-btn" @click="complete" data-index="{{index}}"></div>
-      <div class="item-content" :class="flag ? 'hidden' : 'show'">{{item}}</div>
+      <div class="item-content" :class="{index2: true, world: flag}">{{item}}</div>
     </div>
   </div>
 </template>
@@ -13,8 +13,13 @@
     props: ['todoList'],
     data() {
       return {
-        flag: false
+        flag: false,
+        flags: []
       }
+    },
+    mounted() {
+      console.log(this.flags);
+      this.flags.push(false);
     },
     methods: {
       complete(e) {
@@ -32,6 +37,9 @@
 </script>
 
 <style>
+.hidden {
+  overflow: hidden;
+}
 .container {
   transition: all 0.2s;
 }

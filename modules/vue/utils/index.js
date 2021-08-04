@@ -36,7 +36,39 @@ export function normalizeClassName(classNames, context) {
     }
     if (Array.isArray(classNames)) {
         const result = classNames.map(item => {
+            // 如果是普通的 string 类型，说明是字符串，直接取该字符串作为 className 即可
+            if (typeof item === 'string') {
+                return item;
+            } else {
+                // 如果不是字符串，可能是 js 表达式，需要动态计算类名的值
+                return handleJsExpression(item, context);
+            }
         });
+        return result.join(' ');
+    }
+    // 对象类型取 key 作为类名 {'classA': flag}
+    const arr = [];
+    Object.entries(classNames).forEach(entry => {
+        const [key, value] = entry;
+        const result = handleJsExpression(value, context);
+        if (!!result) {
+            arr.push(key);
+        }
+    });
+    return arr.join(' ');
+
+}
+
+export  function throttle(func, timeout = 16) {
+    let timer = null;
+    return function() {
+        if (timer) {
+            return;
+        }
+        timer = setTimeout(() => {
+            func();
+            timer = null;
+        }, timeout);
     }
 }
 

@@ -86,25 +86,43 @@ class VNode {
             if (key.match(eventReg)) { // {key: '@customClick', value:'clickHandler'}
                 const eventKey = key.match(eventReg)[1];
                 const val = this.parentNode[value].bind(this.parentNode);
-                this.eventBus.on(this.genEventName(eventKey), val);
+                const evtKey = this.genEventName(eventKey);
+                // 每个方法只添加一次
+                if (!this.eventBus.has(evtKey)) {
+                    this.eventBus.on(this.genEventName(eventKey), val);
+                }
             }
         });
     }
 
+    execLifeCycle() {
+        let dom;
+        pushTarget(this.watcher);
+        if (this.propsAttributes) {
+            this.initParentContext(this.propsAttributes);
+        }
+        this.created();
+        dom = createNode(this.vnode, this.proxyContext, true);
+        this.handleStyle();
+        this.mounted();
+        if (!this.oldDom) { // 说明是首次渲染，不是后期的数据更新导致的渲染
+            this.oldDom = dom;
+        }
+        popTarget();
+        return dom;
+    }
+
     createElement() {
         let dom;
-        this.created();
         pushTarget(this.watcher);
         if (this.propsAttributes) {
             this.initParentContext(this.propsAttributes);
         }
         dom = createNode(this.vnode, this.proxyContext);
-        this.handleStyle();
-        this.mounted();
-        popTarget();
-        if (!this.oldDom) { // 说明是首次渲染，不是后期的数据更新导致的渲染
+        if (!this.oldDom) {
             this.oldDom = dom;
         }
+        popTarget();
         return dom;
     }
 

@@ -16,7 +16,7 @@ export default class Vue {
 
      createElement(componentInstance) {
          // console.log(componentInstance.vNodeInstance);
-         this.domTree = componentInstance.createVNode().createElement();
+         this.domTree = componentInstance.createVNode().execLifeCycle();
 
      }
 

@@ -1,5 +1,5 @@
 import Dep from "./dep";
-import { isArray, isObject } from "../utils";
+import { isArray, isObject, throttle } from "../utils";
 
 /**
  * 传入的 target 是每一个组件里面的 data 响应式数据
@@ -54,6 +54,7 @@ function defineReactive(target, dep) {
             const oldVal = target[propertyKey];
             if (oldVal !== value) {
                 target[propertyKey] = value;
+                // throttle(dep.notify.bind(dep))();
                 dep.notify();
             }
             return true;
